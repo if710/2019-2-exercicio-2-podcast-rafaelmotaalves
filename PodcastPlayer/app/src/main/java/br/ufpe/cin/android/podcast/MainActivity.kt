@@ -3,9 +3,9 @@ package br.ufpe.cin.android.podcast
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.ArrayAdapter
 import java.io.FileReader
@@ -45,31 +45,12 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == GET_RSS_FILE_REQUEST_CODE && returnIntent?.data != null) {
             var fileURI: Uri = returnIntent?.data!!
 
-            var rssText = getRssFileText(fileURI)
-
-            var parsedFeedItems = Parser.parse(rssText)
-
-            addFeedItems(parsedFeedItems)
+            LoadPodcastsTask().execute(fileURI)
         }
     }
 
-    private fun getRssFileText (fileUri: Uri) : String {
-        var inputPFD = contentResolver.openFileDescriptor(fileUri, "r")
-
-        var fileDescriptor = inputPFD?.fileDescriptor
-
-        var fileReader = FileReader(fileDescriptor)
-
-        return fileReader.readText()
-    }
-
-    private fun addFeedItems (newFeedItems: List<ItemFeed>) {
-        feedItems = feedItems.union(newFeedItems).toList()
-        renderFeedItems()
-    }
-
-    // TODO: Use podcast custom adapter
-    private fun renderFeedItems () {
+    fun renderFeedItems () {
+        // TODO: Create feed items custom adapter
         var feedItemsString = feedItems.map {
             it.toString()
         }
@@ -83,6 +64,50 @@ class MainActivity : AppCompatActivity() {
         list_feed_items.adapter = adapter
     }
 
+    fun addFeedItems (newFeedItems: List<ItemFeed>) {
+        feedItems = feedItems.union(newFeedItems).toList()
+    }
 
+
+    internal inner class LoadPodcastsTask : AsyncTask<Uri, Void, List<ItemFeed>>() {
+
+
+        override fun doInBackground(vararg fileUris: Uri): List<ItemFeed> {
+            var result: List<ItemFeed> = emptyList()
+
+            for (uri in fileUris) {
+                var rssText = getRssFileText(uri)
+
+                var parsedFeedItems = Parser.parse(rssText)
+
+                result = result.union(parsedFeedItems).toList()
+            }
+
+            return result
+        }
+
+        override fun onPostExecute(resultFeedItems: List<ItemFeed>?) {
+            super.onPostExecute(feedItems)
+
+            if (resultFeedItems != null) {
+                addFeedItems(resultFeedItems)
+                renderFeedItems()
+            }
+
+        }
+
+        private fun getRssFileText (fileUri: Uri) : String {
+
+            var inputPFD = contentResolver.openFileDescriptor(fileUri, "r")
+
+            var fileDescriptor = inputPFD?.fileDescriptor
+
+            var fileReader = FileReader(fileDescriptor)
+
+            return fileReader.readText()
+        }
+
+
+    }
 
 }
