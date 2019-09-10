@@ -32,8 +32,8 @@ episódio, atualizações em segundo plano, notificações de novos episódios, 
 
 | Passo | Completou? |
 | ------ | ------ |
-| 1 | **não** |
-| 2 | **não** |
+| 1 | **sim** |
+| 2 | **sim** |
 | 3 | **não** |
 | 4 | **não** |
 | 5 | **não** |
