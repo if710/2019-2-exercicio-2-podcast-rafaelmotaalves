@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.ArrayAdapter
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import java.io.FileReader
 
 private const val RSS_MIME_TYPE = "application/rss+xml"
@@ -31,6 +33,11 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(getFileIntent, GET_RSS_FILE_REQUEST_CODE)
         }
 
+
+        feed_items_view.layoutManager = LinearLayoutManager(this)
+
+        feed_items_view.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, returnIntent: Intent?) {
@@ -50,18 +57,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun renderFeedItems () {
-        // TODO: Create feed items custom adapter
-        var feedItemsString = feedItems.map {
-            it.toString()
-        }
-
-        val adapter = ArrayAdapter<String>(
-            applicationContext,
-            android.R.layout.simple_list_item_1,
-            feedItemsString
-        )
-
-        list_feed_items.adapter = adapter
+        feed_items_view.adapter = ItemFeedAdapter(feedItems, this)
     }
 
     fun addFeedItems (newFeedItems: List<ItemFeed>) {
