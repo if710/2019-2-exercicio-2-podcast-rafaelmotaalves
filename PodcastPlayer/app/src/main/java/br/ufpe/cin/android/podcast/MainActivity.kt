@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -33,11 +34,11 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(getFileIntent, GET_RSS_FILE_REQUEST_CODE)
         }
 
-
         feed_items_view.layoutManager = LinearLayoutManager(this)
 
-        feed_items_view.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+        feed_items_view.adapter = ItemFeedAdapter(feedItems, this)
 
+        feed_items_view.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, returnIntent: Intent?) {
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         // If the requestCode is equal to the GET_RSS_FILE_REQUEST_CODE execute the file logic
         if (requestCode == GET_RSS_FILE_REQUEST_CODE && returnIntent?.data != null) {
-            var fileURI: Uri = returnIntent?.data!!
+            var fileURI: Uri = returnIntent.data!!
 
             LoadPodcastsTask().execute(fileURI)
         }
@@ -69,6 +70,9 @@ class MainActivity : AppCompatActivity() {
 
 
         override fun doInBackground(vararg fileUris: Uri): List<ItemFeed> {
+
+            var db = ItemFeedDB.getDatabase(applicationContext)
+
             var result: List<ItemFeed> = emptyList()
 
             for (uri in fileUris) {
@@ -78,6 +82,8 @@ class MainActivity : AppCompatActivity() {
 
                 result = result.union(parsedFeedItems).toList()
             }
+
+            db.itemFeedDAO().addItemsFeed(*result.toTypedArray())
 
             return result
         }
