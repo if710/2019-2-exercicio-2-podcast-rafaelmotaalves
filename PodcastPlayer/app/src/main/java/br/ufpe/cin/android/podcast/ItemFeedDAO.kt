@@ -10,7 +10,7 @@ interface ItemFeedDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addItemsFeed (vararg itemsFeed: ItemFeed)
 
-    @Query("SELECT * FROM itemsFeed")
+    @Query("SELECT *FROM itemsFeed")
     fun allFeedItems (): Array<ItemFeed>
 
 }

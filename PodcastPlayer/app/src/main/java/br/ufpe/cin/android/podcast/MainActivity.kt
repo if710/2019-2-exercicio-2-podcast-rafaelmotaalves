@@ -36,9 +36,9 @@ class MainActivity : AppCompatActivity() {
 
         feed_items_view.layoutManager = LinearLayoutManager(this)
 
-        feed_items_view.adapter = ItemFeedAdapter(feedItems, this)
-
         feed_items_view.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+
+        FetchStoredFeed().execute()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, returnIntent: Intent?) {
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == GET_RSS_FILE_REQUEST_CODE && returnIntent?.data != null) {
             var fileURI: Uri = returnIntent.data!!
 
-            LoadPodcastsTask().execute(fileURI)
+            LoadFeedTask().execute(fileURI)
         }
     }
 
@@ -61,13 +61,24 @@ class MainActivity : AppCompatActivity() {
         feed_items_view.adapter = ItemFeedAdapter(feedItems, this)
     }
 
-    fun addFeedItems (newFeedItems: List<ItemFeed>) {
-        feedItems = feedItems.union(newFeedItems).toList()
+    internal inner class FetchStoredFeed : AsyncTask<Void, Void, List<ItemFeed>>() {
+        override fun doInBackground(vararg p0: Void?): List<ItemFeed> {
+            var db = ItemFeedDB.getDatabase(applicationContext)
+
+            return db.itemFeedDAO().allFeedItems().toList()
+        }
+
+        override fun onPostExecute(result: List<ItemFeed>?) {
+            super.onPostExecute(result)
+
+            feedItems = result ?: feedItems
+            renderFeedItems()
+        }
+
     }
 
 
-    internal inner class LoadPodcastsTask : AsyncTask<Uri, Void, List<ItemFeed>>() {
-
+    internal inner class LoadFeedTask : AsyncTask<Uri, Void, List<ItemFeed>>() {
 
         override fun doInBackground(vararg fileUris: Uri): List<ItemFeed> {
 
@@ -88,18 +99,17 @@ class MainActivity : AppCompatActivity() {
             return result
         }
 
-        override fun onPostExecute(resultFeedItems: List<ItemFeed>?) {
-            super.onPostExecute(feedItems)
+        override fun onPostExecute(result: List<ItemFeed>?) {
+            super.onPostExecute(result)
 
-            if (resultFeedItems != null) {
-                addFeedItems(resultFeedItems)
+            if (result != null) {
+                feedItems = feedItems.union(result).toList()
                 renderFeedItems()
             }
 
         }
 
         private fun getRssFileText (fileUri: Uri) : String {
-
             var inputPFD = contentResolver.openFileDescriptor(fileUri, "r")
 
             var fileDescriptor = inputPFD?.fileDescriptor
@@ -108,7 +118,6 @@ class MainActivity : AppCompatActivity() {
 
             return fileReader.readText()
         }
-
 
     }
 
