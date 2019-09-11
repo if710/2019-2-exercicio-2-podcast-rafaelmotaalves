@@ -1,6 +1,7 @@
 package br.ufpe.cin.android.podcast
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,12 @@ class ItemFeedAdapter (private val feedItems: List<ItemFeed>, private val c: Con
         var itemFeed = feedItems[position]
 
         holder.title.text = itemFeed.title
+        holder.title.setOnClickListener {
+            var intent = Intent (c, EpisodeDetailActivity::class.java)
+
+            c.startActivity(intent)
+        }
+
         holder.date.text = itemFeed.pubDate
     }
 
@@ -28,7 +35,7 @@ class ItemFeedAdapter (private val feedItems: List<ItemFeed>, private val c: Con
     class ViewHolder (item: View) : RecyclerView.ViewHolder(item) {
         val title: TextView = item.item_title
         val date: TextView = item.item_date
-
+        
     }
 
 

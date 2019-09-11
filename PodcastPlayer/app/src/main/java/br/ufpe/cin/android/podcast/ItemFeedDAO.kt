@@ -7,7 +7,7 @@ import androidx.room.Query
 
 @Dao
 interface ItemFeedDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addItemsFeed (vararg itemsFeed: ItemFeed)
 
     @Query("SELECT *FROM itemsFeed")
