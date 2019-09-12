@@ -24,6 +24,7 @@ class ItemFeedAdapter (private val feedItems: List<ItemFeed>, private val c: Con
         holder.title.text = itemFeed.title
         holder.title.setOnClickListener {
             var intent = Intent (c, EpisodeDetailActivity::class.java)
+            intent.putExtra("ITEM_FEED_ID", itemFeed.link)
 
             c.startActivity(intent)
         }

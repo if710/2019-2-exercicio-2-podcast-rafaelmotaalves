@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName ="itemsFeed")
-data class ItemFeed(
+data class ItemFeed (
     val title: String,
     @PrimaryKey val link: String,
     val pubDate: String,
