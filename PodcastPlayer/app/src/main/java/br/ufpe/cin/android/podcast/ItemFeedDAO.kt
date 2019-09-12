@@ -13,4 +13,6 @@ interface ItemFeedDAO {
     @Query("SELECT *FROM itemsFeed")
     fun allFeedItems (): Array<ItemFeed>
 
+    @Query("DELETE FROM itemsFeed")
+    fun deleteAll ()
 }
