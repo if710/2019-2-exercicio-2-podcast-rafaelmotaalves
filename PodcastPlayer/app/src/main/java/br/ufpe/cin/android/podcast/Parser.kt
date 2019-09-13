@@ -116,7 +116,7 @@ object Parser {
                 pubDate = readData(parser, "pubDate")
             } else if (name == "description") {
                 description = readData(parser, "description")
-            }  else if (name == "enclosure") {
+            }  else if (name == "guid") {
                 downloadLink = readData(parser, "enclosure")
             }  else {
                 skip(parser)
